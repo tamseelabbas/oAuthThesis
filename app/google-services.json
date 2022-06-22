@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "405616467521",
+    "project_id": "oauththesis-354114",
+    "storage_bucket": "oauththesis-354114.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:405616467521:android:95eb713b40bddcc01ef0c0",
+        "android_client_info": {
+          "package_name": "com.example.oauththesis"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "405616467521-ublku87m33pm1q0r5heohkkif7itpu32.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBHQGPWc1vewGEli9Yu0YP0XqgmI5EKiE4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "405616467521-ublku87m33pm1q0r5heohkkif7itpu32.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
