@@ -10,6 +10,9 @@
         android:id="@+id/sign_in_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
         tools:ignore="MissingConstraints" />
 
     <Button
@@ -27,5 +30,82 @@
         android:layout_height="wrap_content"
         app:barrierDirection="top"
         app:constraint_referenced_ids="sign_in_button" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:padding="10dp"
+        android:background="#000000"
+        android:orientation="vertical"
+        app:layout_constraintBottom_toTopOf="@+id/decrypt"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/sign_in_button">
+
+        <TextView
+            android:id="@+id/step_1"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text=""
+            android:textColor="#0ABC10"
+            android:textSize="20sp" />
+        <TextView
+            android:id="@+id/step_2"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text=""
+            android:textColor="#0ABC10"
+            android:textSize="20sp" />
+        <TextView
+            android:id="@+id/step_3"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text=""
+            android:textColor="#0ABC10"
+            android:textSize="20sp" />
+        <TextView
+            android:id="@+id/step_4"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text=""
+            android:textColor="#0ABC10"
+            android:textSize="20sp" />
+        <TextView
+            android:id="@+id/step_5"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text=""
+            android:textColor="#0ABC10"
+            android:textSize="20sp" />
+        <TextView
+            android:id="@+id/step_6"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text=""
+            android:textColor="#0ABC10"
+            android:textSize="20sp" />
+        <TextView
+            android:id="@+id/step_7"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text=""
+            android:textColor="#0ABC10"
+            android:textSize="20sp" />
+        <TextView
+            android:id="@+id/step_8"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text=""
+            android:textColor="#0ABC10"
+            android:textSize="20sp" />
+        <TextView
+            android:id="@+id/step_9"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text=""
+            android:textColor="#0ABC10"
+            android:textSize="20sp" />
+    </LinearLayout>
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>

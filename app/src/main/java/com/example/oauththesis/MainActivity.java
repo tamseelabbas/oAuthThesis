@@ -11,9 +11,14 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
+import android.preference.PreferenceManager;
+import android.security.keystore.KeyInfo;
+import android.util.Base64;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
@@ -45,10 +50,47 @@ public class MainActivity extends AppCompatActivity {
     GoogleSignInClient mGoogleSignInClient;
     private BiometricPrompt.CryptoObject myCrypto;
 
+    private TextView step_1;
+    private TextView step_2;
+    private TextView step_3;
+    private TextView step_4;
+    private TextView step_5;
+    private TextView step_6;
+    private TextView step_7;
+    private TextView step_8;
+    private TextView step_9;
+
+
+    private String encrypted_email = "";
+    private String encrypted_name = "";
+    private String encrypted_given_name = "";
+    private String encrypted_family_name = "";
+    private String encrypted_pid = "";
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        step_1 = findViewById(R.id.step_1);
+        step_1.setText("");
+        step_2 = findViewById(R.id.step_2);
+        step_2.setText("");
+        step_3 = findViewById(R.id.step_3);
+        step_3.setText("");
+        step_4 = findViewById(R.id.step_4);
+        step_4.setText("");
+        step_5 = findViewById(R.id.step_5);
+        step_5.setText("");
+        step_6 = findViewById(R.id.step_6);
+        step_6.setText("");
+        step_7 = findViewById(R.id.step_7);
+        step_7.setText("");
+        step_8 = findViewById(R.id.step_8);
+        step_8.setText("");
+        step_9 = findViewById(R.id.step_9);
+        step_9.setText("");
+
 
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
                 .requestEmail()
@@ -105,6 +147,58 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    Runnable updater = null;
+
+    private void updateGUI(){
+        final Handler timerHandler = new Handler();
+
+        updater = new Runnable() {
+            @Override
+            public void run() {
+                boolean rerun = false;
+                if(step_1.getText().toString() == ""){
+                    step_1.setText("This is step 1");
+                    rerun = true;
+                }else if(step_2.getText().toString() == ""){
+                    step_2.setText("This is setp 2");
+                    rerun = true;
+
+                }else if(step_3.getText().toString() == ""){
+                    step_3.setText("This is setp 3");
+                    rerun = true;
+
+                }else if(step_4.getText().toString() == ""){
+                    step_4.setText("Encrypted Email : "+ encrypted_email);
+                    rerun = true;
+
+                }else if(step_5.getText().toString() == ""){
+                    step_5.setText("Encrypted Name : "+ encrypted_name);
+                    rerun = true;
+
+                }else if(step_6.getText().toString() == ""){
+                    step_6.setText("Encrypted Family Name : "+ encrypted_family_name);
+                    rerun = true;
+
+                }else if(step_7.getText().toString() == ""){
+                    step_7.setText("Encrypted Given Name : "+ encrypted_given_name);
+                    rerun = true;
+
+                }else if(step_8.getText().toString() == ""){
+                    step_8.setText("Encrypted Id : "+ encrypted_pid);
+                    rerun = true;
+                }
+                else if(step_9.getText().toString() == ""){
+                    step_9.setText("Step 9");
+                }
+                if(rerun){
+                    timerHandler.postDelayed(updater,1000);
+                }
+            }
+        };
+
+        timerHandler.post(updater);
+    }
+
     private void handleSignInResult(Task<GoogleSignInAccount> completedTask) {
         try {
             GoogleSignInAccount account = completedTask.getResult(ApiException.class);
@@ -135,11 +229,27 @@ public class MainActivity extends AppCompatActivity {
                     pID = myCrypto.getCipher().doFinal(
                             personId.getBytes(Charset.defaultCharset()));
 
+
+
+
                 } catch (BadPaddingException e) {
                     e.printStackTrace();
                 } catch (IllegalBlockSizeException e) {
                     e.printStackTrace();
                 }
+
+                PreferenceManager.getDefaultSharedPreferences(MainActivity.this)
+                        .edit().putString("pName", pName.toString())
+                        .apply();
+
+                encrypted_email = pEmail.toString();
+                encrypted_name = pName.toString();
+                encrypted_given_name = pGivenName.toString();
+                encrypted_family_name = pFamilyName.toString();
+                encrypted_pid = pID.toString();
+
+                updateGUI();
+
                 Users users=new Users(pName.toString(), pGivenName.toString(), pFamilyName.toString(), pEmail.toString(), pID.toString(),personPhoto);
                 FirebaseFirestore db = FirebaseFirestore.getInstance();
                 // Add a new document with a generated ID
