@@ -38,6 +38,7 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.nio.charset.Charset;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -59,6 +60,10 @@ public class MainActivity extends AppCompatActivity {
     private TextView step_7;
     private TextView step_8;
     private TextView step_9;
+    private TextView LogedIn;
+    private TextView EncryptAccessToken;
+
+
 
 
     private String encrypted_email = "";
@@ -90,6 +95,10 @@ public class MainActivity extends AppCompatActivity {
         step_8.setText("");
         step_9 = findViewById(R.id.step_9);
         step_9.setText("");
+        LogedIn = findViewById(R.id.LogedIn);
+        LogedIn.setText("");
+        EncryptAccessToken = findViewById(R.id.EncryptAccessToken);
+        EncryptAccessToken.setText("");
 
 
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
@@ -114,21 +123,34 @@ public class MainActivity extends AppCompatActivity {
                     public void available(BiometricPrompt.CryptoObject cryptoObject) {
                         myCrypto=cryptoObject;
                         signIn();
-//                        String plan_string = "This is my string";
+                    }
+                });
+            }
+        });
+
+//        decryptButton.setOnClickListener(new View.OnClickListener(){
+//            @Override
+//            public void onClick(View view) {
+//
+//                bioSecurity.decrypt(new CryptoObjectListener() {
+//                    @Override
+//                    public void available(BiometricPrompt.CryptoObject cryptoObject) {
+//
+//                        String decryptedInfo = null;
 //                        try {
-//                            encryptedInfo = cryptoObject.getCipher().doFinal(
-//                                    plan_string.getBytes(Charset.defaultCharset()));
+//                            decryptedInfo = new String(cryptoObject.getCipher().doFinal(encryptedInfo));
 //                        } catch (BadPaddingException e) {
 //                            e.printStackTrace();
 //                        } catch (IllegalBlockSizeException e) {
 //                            e.printStackTrace();
 //                        }
-//                        Log.d("MY_APP_TAG", "Encrypted information: " +
-//                                Arrays.toString(encryptedInfo));
-                    }
-                });
-            }
-        });
+//                        Log.d("MY_APP_TAG", "Descrypted information: " +
+//                                Arrays.toString(new String[]{decryptedInfo}));
+//                    }
+//                });
+//            }
+//        });
+
     }
     private void signIn() {
         Intent signInIntent = mGoogleSignInClient.getSignInIntent();
@@ -157,14 +179,19 @@ public class MainActivity extends AppCompatActivity {
             public void run() {
                 boolean rerun = false;
                 if(step_1.getText().toString() == ""){
-                    step_1.setText("This is step 1");
+                    step_1.setText("Authenticate using trusty");
                     rerun = true;
                 }else if(step_2.getText().toString() == ""){
-                    step_2.setText("This is setp 2");
+                    step_2.setText("Invoke trusty API");
+                    rerun = true;
+                }
+                else if(EncryptAccessToken.getText().toString() == ""){
+                    EncryptAccessToken.setText("Encrypting access token");
                     rerun = true;
 
-                }else if(step_3.getText().toString() == ""){
-                    step_3.setText("This is setp 3");
+                }
+                else if(step_3.getText().toString() == ""){
+                    step_3.setText("Send data to encrypt");
                     rerun = true;
 
                 }else if(step_4.getText().toString() == ""){
@@ -188,10 +215,16 @@ public class MainActivity extends AppCompatActivity {
                     rerun = true;
                 }
                 else if(step_9.getText().toString() == ""){
-                    step_9.setText("Step 9");
+                    step_9.setText("Send Encrypted data to server");
+                    rerun = true;
+                }else if(LogedIn.getText().toString() == ""){
+                    LogedIn.setText("User LogedIn successfully");
+
+
                 }
+
                 if(rerun){
-                    timerHandler.postDelayed(updater,1000);
+                    timerHandler.postDelayed(updater,100);
                 }
             }
         };
@@ -210,6 +243,7 @@ public class MainActivity extends AppCompatActivity {
                 String personEmail = acct.getEmail();
                 String personId = acct.getId();
                 Uri personPhoto = acct.getPhotoUrl();
+                String idToken = account.getIdToken();
 
                 byte[] pEmail = new byte[0];
                 byte[] pName = new byte[0];
@@ -238,15 +272,36 @@ public class MainActivity extends AppCompatActivity {
                     e.printStackTrace();
                 }
 
-                PreferenceManager.getDefaultSharedPreferences(MainActivity.this)
-                        .edit().putString("pName", pName.toString())
-                        .apply();
+
+
+
 
                 encrypted_email = pEmail.toString();
                 encrypted_name = pName.toString();
                 encrypted_given_name = pGivenName.toString();
                 encrypted_family_name = pFamilyName.toString();
                 encrypted_pid = pID.toString();
+
+                PreferenceManager.getDefaultSharedPreferences(MainActivity.this)
+                        .edit().putString("id", pID.toString())
+                        .apply();
+
+
+                PreferenceManager.getDefaultSharedPreferences(MainActivity.this)
+                        .edit().putString("email", pEmail.toString())
+                        .apply();
+
+                PreferenceManager.getDefaultSharedPreferences(MainActivity.this)
+                        .edit().putString("displayName", pName.toString())
+                        .apply();
+
+                PreferenceManager.getDefaultSharedPreferences(MainActivity.this)
+                        .edit().putString("givenName", pGivenName.toString())
+                        .apply();
+
+                PreferenceManager.getDefaultSharedPreferences(MainActivity.this)
+                        .edit().putString("familyName", pFamilyName.toString())
+                        .apply();
 
                 updateGUI();
 
@@ -273,14 +328,14 @@ public class MainActivity extends AppCompatActivity {
                 });
 
                 //   abc =myRef.child(personId).get();
-                Toast.makeText(this, "User email:"+personEmail, Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, "", Toast.LENGTH_SHORT).show();
             }
 //            startActivity(new Intent(MainActivity.this, SecondActivity.class));
             // Signed in successfully, show authenticated UI.
         } catch (ApiException e) {
             // The ApiException status code indicates the detailed failure reason.
             // Please refer to the GoogleSignInStatusCodes class reference for more information.
-            Log.d("signInResult:failed code=", e.toString());
+            Log.d("tamseelerror", e.toString());
         }
     }
 }

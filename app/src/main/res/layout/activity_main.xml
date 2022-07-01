@@ -57,6 +57,13 @@
             android:textColor="#0ABC10"
             android:textSize="20sp" />
         <TextView
+            android:id="@+id/EncryptAccessToken"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text=""
+            android:textColor="#0ABC10"
+            android:textSize="20sp" />
+        <TextView
             android:id="@+id/step_3"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -105,6 +112,14 @@
             android:text=""
             android:textColor="#0ABC10"
             android:textSize="20sp" />
+        <TextView
+            android:id="@+id/LogedIn"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text=""
+            android:textColor="#0ABC10"
+            android:textSize="20sp" />
+
     </LinearLayout>
 
 

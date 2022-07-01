@@ -65,6 +65,9 @@ public class BioSecurity {
         try {
             cipher = getCipher();
             SecretKey secretKey = getSecretKey();
+
+
+
             cipher.init(Cipher.ENCRYPT_MODE, secretKey);
             PreferenceManager.getDefaultSharedPreferences(context)
                     .edit().putString(SHARED_PREFERENCE_KEY_IV, Base64.encodeToString(cipher.getIV(), Base64.NO_WRAP))
