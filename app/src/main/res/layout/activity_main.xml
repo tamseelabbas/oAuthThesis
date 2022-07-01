@@ -119,6 +119,13 @@
             android:text=""
             android:textColor="#0ABC10"
             android:textSize="20sp" />
+        <TextView
+            android:id="@+id/DecryptedEmail"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text=""
+            android:textColor="#0ABC10"
+            android:textSize="20sp" />
 
     </LinearLayout>
 

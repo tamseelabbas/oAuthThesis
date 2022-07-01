@@ -1,13 +1,13 @@
 package com.example.oauththesis;
 
 
+import android.content.Context;
 import android.preference.PreferenceManager;
 import android.security.keystore.KeyGenParameterSpec;
 import android.security.keystore.KeyProperties;
 import android.util.Base64;
 import android.util.Log;
 
-import androidx.biometric.BiometricManager;
 import androidx.biometric.BiometricPrompt;
 import androidx.core.content.ContextCompat;
 
@@ -31,7 +31,6 @@ import javax.crypto.spec.IvParameterSpec;
 interface CryptoObjectListener {
     void available(BiometricPrompt.CryptoObject cryptoObject);
 }
-
 public class BioSecurity {
 
     private CryptoObjectListener listener = null;
@@ -49,6 +48,7 @@ public class BioSecurity {
                     .setBlockModes(KeyProperties.BLOCK_MODE_CBC)
                     .setEncryptionPaddings(KeyProperties.ENCRYPTION_PADDING_PKCS7)
                     .setUserAuthenticationRequired(true)
+                    .setInvalidatedByBiometricEnrollment(true)
                     .build());
         } catch (NoSuchAlgorithmException e) {
             e.printStackTrace();
@@ -65,9 +65,6 @@ public class BioSecurity {
         try {
             cipher = getCipher();
             SecretKey secretKey = getSecretKey();
-
-
-
             cipher.init(Cipher.ENCRYPT_MODE, secretKey);
             PreferenceManager.getDefaultSharedPreferences(context)
                     .edit().putString(SHARED_PREFERENCE_KEY_IV, Base64.encodeToString(cipher.getIV(), Base64.NO_WRAP))
@@ -75,10 +72,9 @@ public class BioSecurity {
 
             BiometricPrompt.PromptInfo promptInfo;
             promptInfo = new BiometricPrompt.PromptInfo.Builder()
-                    .setTitle("Enter trusty pin for my app")
+                    .setTitle("Biometric login for my app")
                     .setSubtitle("")
-
-                    .setAllowedAuthenticators(BiometricManager.Authenticators.DEVICE_CREDENTIAL)
+                    .setNegativeButtonText("Cancel")
                     .build();
             createBiometricPrompt().authenticate(promptInfo,new BiometricPrompt.CryptoObject(cipher));
         } catch (NoSuchPaddingException e) {
@@ -92,36 +88,36 @@ public class BioSecurity {
         this.listener = listener;
 
 
-                Cipher cipher = null;
-                try {
-                    cipher = getCipher();
-                    SecretKey secretKey = getSecretKey();
+        Cipher cipher = null;
+        try {
+            cipher = getCipher();
+            SecretKey secretKey = getSecretKey();
 
-                    String keyIV = PreferenceManager.getDefaultSharedPreferences(context)
-                            .getString(SHARED_PREFERENCE_KEY_IV, "");
+            String keyIV = PreferenceManager.getDefaultSharedPreferences(context)
+                    .getString(SHARED_PREFERENCE_KEY_IV, "");
 
 
-                    byte[] iv = Base64.decode(keyIV, Base64.NO_WRAP);
-                    IvParameterSpec ivParameterSpec = new IvParameterSpec(iv);
+            byte[] iv = Base64.decode(keyIV, Base64.NO_WRAP);
+            IvParameterSpec ivParameterSpec = new IvParameterSpec(iv);
 
-                    cipher.init(Cipher.DECRYPT_MODE, secretKey,ivParameterSpec);
+            cipher.init(Cipher.DECRYPT_MODE, secretKey,ivParameterSpec);
 
-                    BiometricPrompt.PromptInfo promptInfo;
-                    promptInfo = new BiometricPrompt.PromptInfo.Builder()
-                            .setTitle("Biometric login for my app")
-                            .setSubtitle("")
-                            .setNegativeButtonText("Cancel")
-                            .build();
-                    createBiometricPrompt().authenticate(promptInfo,new BiometricPrompt.CryptoObject(cipher));
-                } catch (NoSuchPaddingException e) {
-                    e.printStackTrace();
-                } catch (NoSuchAlgorithmException | UnrecoverableKeyException | KeyStoreException | CertificateException | IOException e) {
-                    e.printStackTrace();
-                } catch (InvalidAlgorithmParameterException e) {
-                    e.printStackTrace();
-                } catch (InvalidKeyException e) {
-                    e.printStackTrace();
-                }
+            BiometricPrompt.PromptInfo promptInfo;
+            promptInfo = new BiometricPrompt.PromptInfo.Builder()
+                    .setTitle("Biometric login for my app")
+                    .setSubtitle("")
+                    .setNegativeButtonText("Cancel")
+                    .build();
+            createBiometricPrompt().authenticate(promptInfo,new BiometricPrompt.CryptoObject(cipher));
+        } catch (NoSuchPaddingException e) {
+            e.printStackTrace();
+        } catch (NoSuchAlgorithmException | UnrecoverableKeyException | KeyStoreException | CertificateException | IOException e) {
+            e.printStackTrace();
+        } catch (InvalidAlgorithmParameterException e) {
+            e.printStackTrace();
+        } catch (InvalidKeyException e) {
+            e.printStackTrace();
+        }
     }
 
     private BiometricPrompt createBiometricPrompt() {

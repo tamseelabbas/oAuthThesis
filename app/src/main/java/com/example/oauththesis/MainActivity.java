@@ -62,6 +62,9 @@ public class MainActivity extends AppCompatActivity {
     private TextView step_9;
     private TextView LogedIn;
     private TextView EncryptAccessToken;
+    private TextView DecryptedEmail;
+    private byte[] pEmail = new byte[0];
+    private byte[] accessToken = new byte[0];
 
 
 
@@ -99,6 +102,8 @@ public class MainActivity extends AppCompatActivity {
         LogedIn.setText("");
         EncryptAccessToken = findViewById(R.id.EncryptAccessToken);
         EncryptAccessToken.setText("");
+        DecryptedEmail = findViewById(R.id.DecryptedEmail);
+        EncryptAccessToken.setText("");
 
 
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
@@ -128,28 +133,27 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-//        decryptButton.setOnClickListener(new View.OnClickListener(){
-//            @Override
-//            public void onClick(View view) {
-//
-//                bioSecurity.decrypt(new CryptoObjectListener() {
-//                    @Override
-//                    public void available(BiometricPrompt.CryptoObject cryptoObject) {
-//
-//                        String decryptedInfo = null;
-//                        try {
-//                            decryptedInfo = new String(cryptoObject.getCipher().doFinal(encryptedInfo));
-//                        } catch (BadPaddingException e) {
-//                            e.printStackTrace();
-//                        } catch (IllegalBlockSizeException e) {
-//                            e.printStackTrace();
-//                        }
-//                        Log.d("MY_APP_TAG", "Descrypted information: " +
-//                                Arrays.toString(new String[]{decryptedInfo}));
-//                    }
-//                });
-//            }
-//        });
+        decryptButton.setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View view) {
+
+                bioSecurity.decrypt(new CryptoObjectListener() {
+                    @Override
+                    public void available(BiometricPrompt.CryptoObject cryptoObject) {
+
+                        String decryptedInfo = null;
+                        try {
+                            decryptedInfo = new String(cryptoObject.getCipher().doFinal(pEmail));
+                        } catch (BadPaddingException e) {
+                            e.printStackTrace();
+                        } catch (IllegalBlockSizeException e) {
+                            e.printStackTrace();
+                        }
+                        DecryptedEmail.setText(decryptedInfo);
+                    }
+                });
+            }
+        });
 
     }
     private void signIn() {
@@ -191,7 +195,7 @@ public class MainActivity extends AppCompatActivity {
 
                 }
                 else if(step_3.getText().toString() == ""){
-                    step_3.setText("Send data to encrypt");
+                    step_3.setText("Get encrypted data from TEE");
                     rerun = true;
 
                 }else if(step_4.getText().toString() == ""){
@@ -219,8 +223,6 @@ public class MainActivity extends AppCompatActivity {
                     rerun = true;
                 }else if(LogedIn.getText().toString() == ""){
                     LogedIn.setText("User LogedIn successfully");
-
-
                 }
 
                 if(rerun){
@@ -245,23 +247,24 @@ public class MainActivity extends AppCompatActivity {
                 Uri personPhoto = acct.getPhotoUrl();
                 String idToken = account.getIdToken();
 
-                byte[] pEmail = new byte[0];
+                pEmail = new byte[0];
                 byte[] pName = new byte[0];
                 byte[] pGivenName = new byte[0];
                 byte[] pFamilyName = new byte[0];
                 byte[] pID = new byte[0];
+                accessToken = new byte[0];
 
                 try {
                     pEmail = myCrypto.getCipher().doFinal(
                             personEmail.getBytes(Charset.defaultCharset()));
-                    pName = myCrypto.getCipher().doFinal(
-                            personName.getBytes(Charset.defaultCharset()));
-                    pGivenName = myCrypto.getCipher().doFinal(
-                            personGivenName.getBytes(Charset.defaultCharset()));
-                    pFamilyName = myCrypto.getCipher().doFinal(
-                            personFamilyName.getBytes(Charset.defaultCharset()));
-                    pID = myCrypto.getCipher().doFinal(
-                            personId.getBytes(Charset.defaultCharset()));
+//                    pName = myCrypto.getCipher().doFinal(
+//                            personName.getBytes(Charset.defaultCharset()));
+//                    pGivenName = myCrypto.getCipher().doFinal(
+//                            personGivenName.getBytes(Charset.defaultCharset()));
+//                    pFamilyName = myCrypto.getCipher().doFinal(
+//                            personFamilyName.getBytes(Charset.defaultCharset()));
+//                    pID = myCrypto.getCipher().doFinal(
+//                            personId.getBytes(Charset.defaultCharset()));
 
 
 
@@ -276,7 +279,7 @@ public class MainActivity extends AppCompatActivity {
 
 
 
-                encrypted_email = pEmail.toString();
+                encrypted_email = Arrays.toString(pEmail);
                 encrypted_name = pName.toString();
                 encrypted_given_name = pGivenName.toString();
                 encrypted_family_name = pFamilyName.toString();
@@ -339,3 +342,4 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 }
+
