@@ -43,14 +43,16 @@ import java.util.HashMap;
 import java.util.Map;
 
 import javax.crypto.BadPaddingException;
+import javax.crypto.Cipher;
 import javax.crypto.IllegalBlockSizeException;
+import javax.crypto.SecretKey;
 
 public class MainActivity extends AppCompatActivity {
 
     private static final int RC_SIGN_IN = 100;
     GoogleSignInClient mGoogleSignInClient;
     private BiometricPrompt.CryptoObject myCrypto;
-
+    private BioSecurity bioSecurity;
     private TextView step_1;
     private TextView step_2;
     private TextView step_3;
@@ -117,7 +119,7 @@ public class MainActivity extends AppCompatActivity {
         signInButton.setSize(SignInButton.SIZE_STANDARD);
 
         Button decryptButton = findViewById(R.id.decrypt);
-        BioSecurity bioSecurity = new BioSecurity(MainActivity.this);
+        bioSecurity = new BioSecurity(MainActivity.this);
 
         signInButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -254,9 +256,16 @@ public class MainActivity extends AppCompatActivity {
                 byte[] pID = new byte[0];
                 accessToken = new byte[0];
 
+
                 try {
                     pEmail = myCrypto.getCipher().doFinal(
                             personEmail.getBytes(Charset.defaultCharset()));
+
+
+                    Cipher cipher =  bioSecurity.getCipher();
+                    SecretKey secretKey = bioSecurity.getSecretKey();
+                    cipher.init(Cipher.ENCRYPT_MODE, secretKey);
+                    pName= cipher.doFinal(personName.getBytes("UTF-8"));
 //                    pName = myCrypto.getCipher().doFinal(
 //                            personName.getBytes(Charset.defaultCharset()));
 //                    pGivenName = myCrypto.getCipher().doFinal(
@@ -269,18 +278,15 @@ public class MainActivity extends AppCompatActivity {
 
 
 
-                } catch (BadPaddingException e) {
-                    e.printStackTrace();
-                } catch (IllegalBlockSizeException e) {
+                } catch (Exception e) {
                     e.printStackTrace();
                 }
 
 
 
 
-
                 encrypted_email = Arrays.toString(pEmail);
-                encrypted_name = pName.toString();
+                encrypted_name = Arrays.toString(pName);
                 encrypted_given_name = pGivenName.toString();
                 encrypted_family_name = pFamilyName.toString();
                 encrypted_pid = pID.toString();

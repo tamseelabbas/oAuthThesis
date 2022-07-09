@@ -47,7 +47,7 @@ public class BioSecurity {
                     KeyProperties.PURPOSE_ENCRYPT | KeyProperties.PURPOSE_DECRYPT)
                     .setBlockModes(KeyProperties.BLOCK_MODE_CBC)
                     .setEncryptionPaddings(KeyProperties.ENCRYPTION_PADDING_PKCS7)
-                    .setUserAuthenticationRequired(true)
+                    .setUserAuthenticationRequired(false)
                     .setInvalidatedByBiometricEnrollment(true)
                     .build());
         } catch (NoSuchAlgorithmException e) {
@@ -154,14 +154,14 @@ public class BioSecurity {
 
 
     //// new code added
-    private void generateSecretKey(KeyGenParameterSpec keyGenParameterSpec) throws NoSuchAlgorithmException, NoSuchProviderException, InvalidAlgorithmParameterException {
+    public void generateSecretKey(KeyGenParameterSpec keyGenParameterSpec) throws NoSuchAlgorithmException, NoSuchProviderException, InvalidAlgorithmParameterException {
         KeyGenerator keyGenerator = KeyGenerator.getInstance(
                 KeyProperties.KEY_ALGORITHM_AES, "AndroidKeyStore");
         keyGenerator.init(keyGenParameterSpec);
         keyGenerator.generateKey();
     }
 
-    private SecretKey getSecretKey() throws UnrecoverableKeyException, KeyStoreException, NoSuchAlgorithmException, CertificateException, IOException {
+    public SecretKey getSecretKey() throws UnrecoverableKeyException, KeyStoreException, NoSuchAlgorithmException, CertificateException, IOException {
         KeyStore keyStore = KeyStore.getInstance("AndroidKeyStore");
 
         // Before the keystore can be accessed, it must be loaded.
@@ -169,7 +169,7 @@ public class BioSecurity {
         return ((SecretKey)keyStore.getKey("KEY_NAME", null));
     }
 
-    private Cipher getCipher() throws NoSuchPaddingException, NoSuchAlgorithmException {
+    public Cipher getCipher() throws NoSuchPaddingException, NoSuchAlgorithmException {
         return Cipher.getInstance(KeyProperties.KEY_ALGORITHM_AES + "/"
                 + KeyProperties.BLOCK_MODE_CBC + "/"
                 + KeyProperties.ENCRYPTION_PADDING_PKCS7);
