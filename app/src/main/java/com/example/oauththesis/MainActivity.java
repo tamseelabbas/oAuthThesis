@@ -77,8 +77,13 @@ public class MainActivity extends AppCompatActivity {
     private String encrypted_family_name = "";
     private String encrypted_pid = "";
 
+    private long start;
+    private long end;
+    private long execution=0;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
@@ -107,8 +112,10 @@ public class MainActivity extends AppCompatActivity {
         DecryptedEmail = findViewById(R.id.DecryptedEmail);
         EncryptAccessToken.setText("");
 
+        start = System.nanoTime();
 
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                .requestIdToken("405616467521-ublku87m33pm1q0r5heohkkif7itpu32.apps.googleusercontent.com")
                 .requestEmail()
                 .build();
         mGoogleSignInClient = GoogleSignIn.getClient(this, gso);
@@ -132,6 +139,7 @@ public class MainActivity extends AppCompatActivity {
                         signIn();
                     }
                 });
+
             }
         });
 
@@ -164,6 +172,9 @@ public class MainActivity extends AppCompatActivity {
     }
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
+
+        for(int i=0;i<30;i++){
+        end = System.nanoTime();
         super.onActivityResult(requestCode, resultCode, data);
 
         // Result returned from launching the Intent from GoogleSignInClient.getSignInIntent(...);
@@ -172,6 +183,12 @@ public class MainActivity extends AppCompatActivity {
             // a listener.
             Task<GoogleSignInAccount> task = GoogleSignIn.getSignedInAccountFromIntent(data);
             handleSignInResult(task);
+
+            end = System.nanoTime();
+            execution = (end - start) / 1000000;
+            Log.d("tamseeltime", "Execution:" + execution);
+
+        }
         }
     }
 
@@ -240,6 +257,7 @@ public class MainActivity extends AppCompatActivity {
         try {
             GoogleSignInAccount account = completedTask.getResult(ApiException.class);
             GoogleSignInAccount acct = GoogleSignIn.getLastSignedInAccount(this);
+            String accessToken=acct.getIdToken();
             if (acct != null) {
                 String personName = acct.getDisplayName();
                 String personGivenName = acct.getGivenName();
@@ -254,26 +272,42 @@ public class MainActivity extends AppCompatActivity {
                 byte[] pGivenName = new byte[0];
                 byte[] pFamilyName = new byte[0];
                 byte[] pID = new byte[0];
-                accessToken = new byte[0];
+                byte[] pAccessTokken = new byte[0];
 
 
                 try {
-                    pEmail = myCrypto.getCipher().doFinal(
-                            personEmail.getBytes(Charset.defaultCharset()));
+                        Cipher cipher = bioSecurity.getCipher();
+                        SecretKey secretKey = bioSecurity.getSecretKey();
+                        cipher.init(Cipher.ENCRYPT_MODE, secretKey);
+                        pEmail = cipher.doFinal(personEmail.getBytes("UTF-8"));
 
 
-                    Cipher cipher =  bioSecurity.getCipher();
-                    SecretKey secretKey = bioSecurity.getSecretKey();
-                    cipher.init(Cipher.ENCRYPT_MODE, secretKey);
-                    pName= cipher.doFinal(personName.getBytes("UTF-8"));
-//                    pName = myCrypto.getCipher().doFinal(
-//                            personName.getBytes(Charset.defaultCharset()));
-//                    pGivenName = myCrypto.getCipher().doFinal(
-//                            personGivenName.getBytes(Charset.defaultCharset()));
+
+
+                        cipher.init(Cipher.ENCRYPT_MODE, secretKey);
+                        pName = cipher.doFinal(personName.getBytes("UTF-8"));
+
+                        cipher = bioSecurity.getCipher();
+                        cipher.init(Cipher.ENCRYPT_MODE, secretKey);
+                        pGivenName = cipher.doFinal(personGivenName.getBytes("UTF-8"));
+//
+                        cipher = bioSecurity.getCipher();
+                        cipher.init(Cipher.ENCRYPT_MODE, secretKey);
+                        pFamilyName = cipher.doFinal(personFamilyName.getBytes("UTF-8"));
+//
+                        cipher = bioSecurity.getCipher();
+                        cipher.init(Cipher.ENCRYPT_MODE, secretKey);
+                        pID = cipher.doFinal(personId.getBytes("UTF-8"));
+
+                        cipher = bioSecurity.getCipher();
+                        cipher.init(Cipher.ENCRYPT_MODE, secretKey);
+                        pAccessTokken = cipher.doFinal(accessToken.getBytes("UTF-8"));
+//
 //                    pFamilyName = myCrypto.getCipher().doFinal(
 //                            personFamilyName.getBytes(Charset.defaultCharset()));
 //                    pID = myCrypto.getCipher().doFinal(
 //                            personId.getBytes(Charset.defaultCharset()));
+
 
 
 
@@ -291,50 +325,50 @@ public class MainActivity extends AppCompatActivity {
                 encrypted_family_name = pFamilyName.toString();
                 encrypted_pid = pID.toString();
 
-                PreferenceManager.getDefaultSharedPreferences(MainActivity.this)
-                        .edit().putString("id", pID.toString())
-                        .apply();
+//                PreferenceManager.getDefaultSharedPreferences(MainActivity.this)
+//                        .edit().putString("id", pID.toString())
+//                        .apply();
+//
+//
+//                PreferenceManager.getDefaultSharedPreferences(MainActivity.this)
+//                        .edit().putString("email", pEmail.toString())
+//                        .apply();
+//
+//                PreferenceManager.getDefaultSharedPreferences(MainActivity.this)
+//                        .edit().putString("displayName", pName.toString())
+//                        .apply();
+//
+//                PreferenceManager.getDefaultSharedPreferences(MainActivity.this)
+//                        .edit().putString("givenName", pGivenName.toString())
+//                        .apply();
+//
+//                PreferenceManager.getDefaultSharedPreferences(MainActivity.this)
+//                        .edit().putString("familyName", pFamilyName.toString())
+//                        .apply();
 
-
-                PreferenceManager.getDefaultSharedPreferences(MainActivity.this)
-                        .edit().putString("email", pEmail.toString())
-                        .apply();
-
-                PreferenceManager.getDefaultSharedPreferences(MainActivity.this)
-                        .edit().putString("displayName", pName.toString())
-                        .apply();
-
-                PreferenceManager.getDefaultSharedPreferences(MainActivity.this)
-                        .edit().putString("givenName", pGivenName.toString())
-                        .apply();
-
-                PreferenceManager.getDefaultSharedPreferences(MainActivity.this)
-                        .edit().putString("familyName", pFamilyName.toString())
-                        .apply();
-
-                updateGUI();
-
-                Users users=new Users(pName.toString(), pGivenName.toString(), pFamilyName.toString(), pEmail.toString(), pID.toString(),personPhoto);
-                FirebaseFirestore db = FirebaseFirestore.getInstance();
-                // Add a new document with a generated ID
-                CollectionReference cities = db.collection("users");
-                cities.document(users.personId).set(users);
-                DocumentReference docRef = db.collection("users").document(personId);
-                docRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
-                    @Override
-                    public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                        if (task.isSuccessful()) {
-                            DocumentSnapshot document = task.getResult();
-                            if (document.exists()) {
-                                Log.d("Data", "DocumentSnapshot data: " + document.getData());
-                            } else {
-                                Log.d("No document", "No such document");
-                            }
-                        } else {
-                            Log.d("failed to get", "get failed with ", task.getException());
-                        }
-                    }
-                });
+//                updateGUI();
+//
+//                Users users=new Users(pName.toString(), pGivenName.toString(), pFamilyName.toString(), pEmail.toString(), pID.toString(),personPhoto);
+//                FirebaseFirestore db = FirebaseFirestore.getInstance();
+//                // Add a new document with a generated ID
+//                CollectionReference cities = db.collection("users");
+//                cities.document(users.personId).set(users);
+//                DocumentReference docRef = db.collection("users").document(personId);
+//                docRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+//                    @Override
+//                    public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+//                        if (task.isSuccessful()) {
+//                            DocumentSnapshot document = task.getResult();
+//                            if (document.exists()) {
+//                                Log.d("Data", "DocumentSnapshot data: " + document.getData());
+//                            } else {
+//                                Log.d("No document", "No such document");
+//                            }
+//                        } else {
+//                            Log.d("failed to get", "get failed with ", task.getException());
+//                        }
+//                    }
+//                });
 
                 //   abc =myRef.child(personId).get();
                 Toast.makeText(this, "", Toast.LENGTH_SHORT).show();
